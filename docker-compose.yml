@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Servicio de base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: sacrgapi_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2024
+      MYSQL_DATABASE: sacrgapi_database
+      MYSQL_USER: sacrgapi_user
+      MYSQL_PASSWORD: sacrgapi_password_2024
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES utf8mb4'
+    networks:
+      - sacrgapi_network
+
+  # Servicio de aplicación PHP
+  web:
+    build: .
+    container_name: sacrgapi_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./config/php.ini:/usr/local/etc/php/php.ini
+    depends_on:
+      - db
+    networks:
+      - sacrgapi_network
+    environment:
+      - DB_HOST=db
+      - DB_NAME=sacrgapi_database
+      - DB_USER=sacrgapi_user
+      - DB_PASS=sacrgapi_password_2024
+
+  # Servicio de phpMyAdmin (opcional, para administración de BD)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: sacrgapi_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: sacrgapi_user
+      PMA_PASSWORD: sacrgapi_password_2024
+    depends_on:
+      - db
+    networks:
+      - sacrgapi_network
+
+volumes:
+  mysql_data:
+
+networks:
+  sacrgapi_network:
+    driver: bridge

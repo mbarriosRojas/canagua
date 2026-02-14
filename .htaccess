@@ -1,0 +1,22 @@
+RewriteEngine On
+
+# Redirigir todo el tráfico a public/index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/index.php [QSA,L]
+
+# Configuraciones de seguridad
+<Files "*.env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Configuración de headers de seguridad (comentado temporalmente)
+# Header always set X-Content-Type-Options nosniff
+# Header always set X-Frame-Options DENY
+# Header always set X-XSS-Protection "1; mode=block"
