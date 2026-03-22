@@ -6,9 +6,46 @@
  */
 class Inventario {
     private $db;
+    private static $hasNombreColumn = null;
     
     public function __construct() {
         $this->db = Database::getInstance();
+    }
+    
+    /**
+     * Comprueba si la tabla inventario tiene la columna nombre (cache en memoria)
+     */
+    private function hasNombreColumn() {
+        if (self::$hasNombreColumn !== null) {
+            return self::$hasNombreColumn;
+        }
+        try {
+            $r = $this->db->fetchOne(
+                "SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'inventario' AND COLUMN_NAME = 'nombre'"
+            );
+            self::$hasNombreColumn = (bool) $r;
+            return self::$hasNombreColumn;
+        } catch (Exception $e) {
+            self::$hasNombreColumn = false;
+            return false;
+        }
+    }
+    
+    /**
+     * Añade la columna nombre si no existe (para bases instaladas antes del cambio)
+     */
+    private function ensureNombreColumn() {
+        if ($this->hasNombreColumn()) {
+            return true;
+        }
+        try {
+            $this->db->query("ALTER TABLE inventario ADD COLUMN nombre VARCHAR(200) NULL AFTER cod_equipo");
+            self::$hasNombreColumn = true;
+            return true;
+        } catch (Exception $e) {
+            error_log("Error añadiendo columna nombre: " . $e->getMessage());
+            return false;
+        }
     }
     
     /**
@@ -23,9 +60,14 @@ class Inventario {
             $params = [];
             
             if (!empty($filters['search'])) {
-                $sql .= " AND (i.cod_equipo LIKE ? OR i.ubicacion LIKE ? OR i.marca LIKE ? OR i.modelo LIKE ?)";
                 $search = "%{$filters['search']}%";
-                $params = [$search, $search, $search, $search];
+                if ($this->hasNombreColumn()) {
+                    $sql .= " AND (i.cod_equipo LIKE ? OR i.nombre LIKE ? OR i.ubicacion LIKE ? OR i.marca LIKE ? OR i.modelo LIKE ?)";
+                    $params = [$search, $search, $search, $search, $search];
+                } else {
+                    $sql .= " AND (i.cod_equipo LIKE ? OR i.ubicacion LIKE ? OR i.marca LIKE ? OR i.modelo LIKE ?)";
+                    $params = [$search, $search, $search, $search];
+                }
             }
             
             if (!empty($filters['estado'])) {
@@ -86,28 +128,56 @@ class Inventario {
                 return ['success' => false, 'message' => 'Ya existe un equipo con este código'];
             }
             
-            $id = $this->db->insert(
-                "INSERT INTO inventario (personal_id_personal, cod_equipo, ubicacion, cedula_personal, 
-                                       cantidad, estado, serial, marca, modelo, color, medidas, 
-                                       capacidad, otras_caracteristicas, observacion) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                [
-                    $data['personal_id_personal'] ?? null,
-                    $data['cod_equipo'],
-                    $data['ubicacion'] ?? null,
-                    $data['cedula_personal'] ?? null,
-                    $data['cantidad'] ?? 1,
-                    $data['estado'] ?? 'Bueno',
-                    $data['serial'] ?? null,
-                    $data['marca'] ?? null,
-                    $data['modelo'] ?? null,
-                    $data['color'] ?? null,
-                    $data['medidas'] ?? null,
-                    $data['capacidad'] ?? null,
-                    $data['otras_caracteristicas'] ?? null,
-                    $data['observacion'] ?? null
-                ]
-            );
+            $this->ensureNombreColumn();
+            
+            if ($this->hasNombreColumn()) {
+                $id = $this->db->insert(
+                    "INSERT INTO inventario (personal_id_personal, cod_equipo, nombre, ubicacion, cedula_personal, 
+                                           cantidad, estado, serial, marca, modelo, color, medidas, 
+                                           capacidad, otras_caracteristicas, observacion) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        $data['personal_id_personal'] ?? null,
+                        $data['cod_equipo'],
+                        $data['nombre'] ?? null,
+                        $data['ubicacion'] ?? null,
+                        $data['cedula_personal'] ?? null,
+                        $data['cantidad'] ?? 1,
+                        $data['estado'] ?? 'Bueno',
+                        $data['serial'] ?? null,
+                        $data['marca'] ?? null,
+                        $data['modelo'] ?? null,
+                        $data['color'] ?? null,
+                        $data['medidas'] ?? null,
+                        $data['capacidad'] ?? null,
+                        $data['otras_caracteristicas'] ?? null,
+                        $data['observacion'] ?? null
+                    ]
+                );
+            } else {
+                $id = $this->db->insert(
+                    "INSERT INTO inventario (personal_id_personal, cod_equipo, ubicacion, cedula_personal, 
+                                           cantidad, estado, serial, marca, modelo, color, medidas, 
+                                           capacidad, otras_caracteristicas, observacion) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        $data['personal_id_personal'] ?? null,
+                        $data['cod_equipo'],
+                        $data['ubicacion'] ?? null,
+                        $data['cedula_personal'] ?? null,
+                        $data['cantidad'] ?? 1,
+                        $data['estado'] ?? 'Bueno',
+                        $data['serial'] ?? null,
+                        $data['marca'] ?? null,
+                        $data['modelo'] ?? null,
+                        $data['color'] ?? null,
+                        $data['medidas'] ?? null,
+                        $data['capacidad'] ?? null,
+                        $data['otras_caracteristicas'] ?? null,
+                        $data['observacion'] ?? null
+                    ]
+                );
+            }
             
             return ['success' => true, 'id' => $id];
             
@@ -138,30 +208,60 @@ class Inventario {
                 return ['success' => false, 'message' => 'Ya existe otro equipo con este código'];
             }
             
-            $result = $this->db->update(
-                "UPDATE inventario SET personal_id_personal = ?, cod_equipo = ?, ubicacion = ?, 
-                                       cedula_personal = ?, cantidad = ?, estado = ?, serial = ?, 
-                                       marca = ?, modelo = ?, color = ?, medidas = ?, capacidad = ?, 
-                                       otras_caracteristicas = ?, observacion = ? 
-                 WHERE id_inventario = ?",
-                [
-                    $data['personal_id_personal'] ?? null,
-                    $data['cod_equipo'],
-                    $data['ubicacion'] ?? null,
-                    $data['cedula_personal'] ?? null,
-                    $data['cantidad'] ?? 1,
-                    $data['estado'] ?? 'Bueno',
-                    $data['serial'] ?? null,
-                    $data['marca'] ?? null,
-                    $data['modelo'] ?? null,
-                    $data['color'] ?? null,
-                    $data['medidas'] ?? null,
-                    $data['capacidad'] ?? null,
-                    $data['otras_caracteristicas'] ?? null,
-                    $data['observacion'] ?? null,
-                    $id
-                ]
-            );
+            $this->ensureNombreColumn();
+            
+            if ($this->hasNombreColumn()) {
+                $result = $this->db->update(
+                    "UPDATE inventario SET personal_id_personal = ?, cod_equipo = ?, nombre = ?, ubicacion = ?, 
+                                           cedula_personal = ?, cantidad = ?, estado = ?, serial = ?, 
+                                           marca = ?, modelo = ?, color = ?, medidas = ?, capacidad = ?, 
+                                           otras_caracteristicas = ?, observacion = ? 
+                     WHERE id_inventario = ?",
+                    [
+                        $data['personal_id_personal'] ?? null,
+                        $data['cod_equipo'],
+                        $data['nombre'] ?? null,
+                        $data['ubicacion'] ?? null,
+                        $data['cedula_personal'] ?? null,
+                        $data['cantidad'] ?? 1,
+                        $data['estado'] ?? 'Bueno',
+                        $data['serial'] ?? null,
+                        $data['marca'] ?? null,
+                        $data['modelo'] ?? null,
+                        $data['color'] ?? null,
+                        $data['medidas'] ?? null,
+                        $data['capacidad'] ?? null,
+                        $data['otras_caracteristicas'] ?? null,
+                        $data['observacion'] ?? null,
+                        $id
+                    ]
+                );
+            } else {
+                $result = $this->db->update(
+                    "UPDATE inventario SET personal_id_personal = ?, cod_equipo = ?, ubicacion = ?, 
+                                           cedula_personal = ?, cantidad = ?, estado = ?, serial = ?, 
+                                           marca = ?, modelo = ?, color = ?, medidas = ?, capacidad = ?, 
+                                           otras_caracteristicas = ?, observacion = ? 
+                     WHERE id_inventario = ?",
+                    [
+                        $data['personal_id_personal'] ?? null,
+                        $data['cod_equipo'],
+                        $data['ubicacion'] ?? null,
+                        $data['cedula_personal'] ?? null,
+                        $data['cantidad'] ?? 1,
+                        $data['estado'] ?? 'Bueno',
+                        $data['serial'] ?? null,
+                        $data['marca'] ?? null,
+                        $data['modelo'] ?? null,
+                        $data['color'] ?? null,
+                        $data['medidas'] ?? null,
+                        $data['capacidad'] ?? null,
+                        $data['otras_caracteristicas'] ?? null,
+                        $data['observacion'] ?? null,
+                        $id
+                    ]
+                );
+            }
             
             return ['success' => true];
             
@@ -215,6 +315,34 @@ class Inventario {
         } catch (Exception $e) {
             error_log("Error obteniendo opciones: " . $e->getMessage());
             return ['responsables' => [], 'ubicaciones' => []];
+        }
+    }
+    
+    /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT i.*, CONCAT(p.nombre, ' ', p.apellido) as responsable FROM inventario i LEFT JOIN personal p ON i.personal_id_personal = p.id_personal WHERE 1=1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (i.cod_equipo LIKE ? OR i.nombre LIKE ? OR i.ubicacion LIKE ? OR i.marca LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term; $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(i.fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(i.fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            $sql .= " ORDER BY i.cod_equipo";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport inventario: " . $e->getMessage());
+            return [];
         }
     }
     

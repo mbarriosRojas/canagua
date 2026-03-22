@@ -16,63 +16,107 @@
         .main-content { padding: 2rem; }
         .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
         .btn-primary { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border: none; border-radius: 8px; }
+
+        @media print {
+            body { background-color: #ffffff; }
+            .sidebar,
+            .btn,
+            #alertContainer,
+            #mainView,
+            #addParticipanteModal {
+                display: none !important;
+            }
+            #detailView {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-graduation-cap fa-2x text-white mb-2"></i>
-                        <h5 class="text-white"><?php echo Config::getAppName(); ?></h5>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link" href="/public/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/programas"><i class="fas fa-list-alt"></i> Programas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/instituciones"><i class="fas fa-building"></i> Instituciones</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/personal"><i class="fas fa-chalkboard-teacher"></i> Personal</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/talleres"><i class="fas fa-tools"></i> Talleres</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="/public/cursos"><i class="fas fa-book"></i> Cursos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/inventario"><i class="fas fa-boxes"></i> Inventario</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/calificaciones"><i class="fas fa-chart-line"></i> Calificaciones</a></li>
-                        <li class="nav-item mt-4"><a class="nav-link" href="/public/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-                    </ul>
-                </div>
-            </nav>
-
+            <?php $currentModule = 'cursos'; $currentSection = 'index'; include __DIR__ . '/../partials/sidebar.php'; ?>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><i class="fas fa-book me-2"></i>Gestión de Cursos</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCursoModal">
+                        <a href="<?php echo BASE_URL; ?>/cursos/create" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Nuevo Curso
-                        </button>
+                        </a>
                     </div>
                 </div>
 
                 <div id="alertContainer"></div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="cursosTable">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Código</th>
-                                        <th>Nombre del Curso</th>
-                                        <th>Instructor</th>
-                                        <th>Duración (Horas)</th>
-                                        <th>Año</th>
-                                        <th>Periodo</th>
-                                        <th>N° Clases</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                <div id="mainView">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="cursosTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Nombre del Curso</th>
+                                            <th>Instructor</th>
+                                            <th>Duración (Horas)</th>
+                                            <th>Año</th>
+                                            <th>Periodo</th>
+                                            <th>N° Clases</th>
+                                            <th>Participantes</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="detailView" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div>
+                            <h2 class="h4 mb-1">Detalle del Curso</h2>
+                            <p class="mb-0 text-muted" id="cursoTitle"></p>
+                        </div>
+                        <div class="btn-toolbar">
+                            <button type="button" class="btn btn-outline-secondary me-2" onclick="backToMainView()">
+                                <i class="fas fa-arrow-left me-1"></i>Volver al listado
+                            </button>
+                            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addParticipanteModal">
+                                <i class="fas fa-user-plus me-1"></i>Agregar Participante
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="printCourseParticipants()">
+                                <i class="fas fa-print me-1"></i>Imprimir Lista
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    Información del Curso
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Código:</strong> <span id="detalleCodCurso"></span></p>
+                                    <p class="mb-1"><strong>Nombre:</strong> <span id="detalleNombreCurso"></span></p>
+                                    <p class="mb-1"><strong>Instructor:</strong> <span id="detalleInstructor"></span></p>
+                                    <p class="mb-1"><strong>Año:</strong> <span id="detalleAno"></span></p>
+                                    <p class="mb-1"><strong>Periodo:</strong> <span id="detallePeriodo"></span></p>
+                                    <p class="mb-1"><strong>Duración (horas):</strong> <span id="detalleDuracion"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    Participantes del Curso
+                                </div>
+                                <div class="card-body">
+                                    <div id="courseParticipantsList" class="list-group list-group-flush small"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,87 +124,80 @@
         </div>
     </div>
 
-    <!-- Modal Crear Curso -->
-    <div class="modal fade" id="createCursoModal" tabindex="-1">
+    <!-- Modal: Agregar participante al curso -->
+    <div class="modal fade" id="addParticipanteModal" tabindex="-1" aria-labelledby="addParticipanteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-book me-2"></i>Nuevo Curso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addParticipanteModalLabel">Agregar Participante al Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <form id="createCursoForm">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cod_curso" class="form-label">Código del Curso *</label>
-                                <input type="text" class="form-control" id="cod_curso" name="cod_curso" required>
+                <div class="modal-body">
+                    <form id="searchParticipanteForm" onsubmit="searchCursoParticipants(); return false;">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label for="searchCedulaParticipante" class="form-label">Cédula</label>
+                                <input type="number" inputmode="numeric" id="searchCedulaParticipante" class="form-control" placeholder="12345678" min="0" step="1">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="nombre_curso" class="form-label">Nombre del Curso *</label>
-                                <input type="text" class="form-control" id="nombre_curso" name="nombre_curso" required>
+                            <div class="col-md-4">
+                                <label for="searchNombreParticipante" class="form-label">Nombre o Apellido</label>
+                                <input type="text" id="searchNombreParticipante" class="form-control" placeholder="Nombre o apellido">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="personal_id_personal" class="form-label">Instructor *</label>
-                                <select class="form-select" id="personal_id_personal" name="personal_id_personal" required>
-                                    <option value="">Seleccionar instructor</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                            <label for="ano" class="form-label">Año *</label>
-                            <input type="number" class="form-control" id="ano" name="ano" min="2020" max="2030" required>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Buscar
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearParticipanteSearch()">
+                                    Limpiar
+                                </button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="periodo" class="form-label">Periodo *</label>
-                                <select class="form-select" id="periodo" name="periodo" required>
-                                    <option value="">Seleccionar periodo</option>
-                                    <option value="I">I</option>
-                                    <option value="II">II</option>
-                                    <option value="III">III</option>
-                                    <option value="IV">IV</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="duracion" class="form-label">Duración (Horas)</label>
-                                <input type="number" class="form-control" id="duracion" name="duracion" min="1">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="num_de_clases" class="form-label">Número de Clases</label>
-                                <input type="number" class="form-control" id="num_de_clases" name="num_de_clases" min="1">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cedula_persona" class="form-label">Cédula Persona</label>
-                                <input type="text" class="form-control" id="cedula_persona" name="cedula_persona">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar</button>
-                    </div>
-                </form>
+                    </form>
+                    <hr>
+                    <div id="searchParticipantesResults"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <?php include __DIR__ . '/../partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             let cursosTable;
+            let currentCursoId = null;
+            let currentCursoData = null;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === '1') {
+                showAlert('Curso guardado correctamente.', 'success');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/cursos');
+            }
+            if (urlParams.get('error') === 'notfound') {
+                showAlert('Curso no encontrado.', 'danger');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/cursos');
+            }
             
+            function showAlert(message, type) {
+                const icon = type === 'success' ? 'success' : type === 'danger' ? 'error' : type === 'warning' ? 'warning' : 'info';
+                const title = type === 'success' ? 'Éxito' : type === 'danger' ? 'Error' : type === 'warning' ? 'Aviso' : 'Información';
+                Swal.fire({ icon: icon, title: title, text: message });
+            }
+
+            function normalizeCedula(value) {
+                if (!value) return '';
+                return value.replace(/^[VE]-/i, '').replace(/\D/g, '');
+            }
+
             function initTable() {
                 cursosTable = $('#cursosTable').DataTable({
                     processing: true,
                     serverSide: false,
-                    ajax: { url: '/public/cursos/list', type: 'GET' },
+                    ajax: { url: '<?php echo BASE_URL; ?>/cursos/list', type: 'GET' },
                     columns: [
                         { data: 'cod_curso' },
                         { data: 'nombre_curso' },
@@ -169,16 +206,20 @@
                         { data: 'ano' },
                         { data: 'periodo' },
                         { data: 'num_de_clases' },
+                        { data: 'participantes_count', defaultContent: 0 },
                         {
                             data: null,
                             orderable: false,
                             render: function(data, type, row) {
                                 return `
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editCurso(${row.id_cursos})">
+                                        <button type="button" class="btn btn-sm btn-outline-info" onclick="viewCursoDetail(${row.id_cursos})" title="Ver detalle y participantes">
+                                            <i class="fas fa-users"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editCurso(${row.id_cursos})" title="Editar curso">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCurso(${row.id_cursos})">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCurso(${row.id_cursos})" title="Eliminar curso">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -187,105 +228,292 @@
                         }
                     ],
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                    pageLength: 10,
+                    paging: false,
+                    info: false,
                     responsive: true
                 });
             }
-            
-            function loadOptions() {
-                console.log('Cargando opciones de cursos...');
+
+            window.viewCursoDetail = function(id) {
+                currentCursoId = id;
+
                 $.ajax({
-                    url: '/public/cursos/options',
-                    type: 'GET',
+                    url: `<?php echo BASE_URL; ?>/cursos/get/${id}`,
+                    method: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        console.log('Respuesta recibida:', response);
-                        if (response.success) {
-                            const options = response.data;
-                            console.log('Opciones:', options);
-                            
-                            // Llenar instructores
-                            $('#personal_id_personal').html('<option value="">Seleccionar instructor</option>');
-                            if (options.instructores && options.instructores.length > 0) {
-                                options.instructores.forEach(instructor => {
-                                    $('#personal_id_personal').append(`<option value="${instructor.id_personal}">${instructor.nombre} ${instructor.apellido}</option>`);
-                                });
-                            }
+                        if (response.success && response.data) {
+                            currentCursoData = response.data;
+                            displayCursoDetail(response.data);
+                            loadCursoParticipants();
+                            $('#mainView').hide();
+                            $('#detailView').show();
                         } else {
-                            console.error('Error en respuesta:', response.message);
-                            showAlert('Error al cargar opciones: ' + response.message, 'danger');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error AJAX:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        showAlert('Error al cargar opciones del formulario', 'danger');
-                    }
-                });
-            }
-            
-            function showAlert(message, type) {
-                const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                $('#alertContainer').html(alertHtml);
-                setTimeout(() => { $('#alertContainer .alert').alert('close'); }, 5000);
-            }
-            
-            $('#createCursoForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '/public/cursos/create',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            $('#createCursoModal').modal('hide');
-                            $('#createCursoForm')[0].reset();
-                            showAlert('Curso creado exitosamente', 'success');
-                            cursosTable.ajax.reload();
-                        } else {
-                            showAlert(response.message, 'danger');
+                            showAlert('Curso no encontrado.', 'danger');
                         }
                     },
                     error: function() {
-                        showAlert('Error al crear curso', 'danger');
+                        showAlert('Error al cargar detalle del curso.', 'danger');
                     }
                 });
-            });
-            
-            window.editCurso = function(id) {
-                showAlert('Funcionalidad de edición en desarrollo', 'info');
             };
-            
-            window.deleteCurso = function(id) {
-                if (confirm('¿Está seguro de que desea eliminar este curso?')) {
-                    $.ajax({
-                        url: `/public/cursos/delete/${id}`,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                showAlert('Curso eliminado exitosamente', 'success');
-                                cursosTable.ajax.reload();
-                            } else {
-                                showAlert(response.message, 'danger');
-                            }
-                        },
-                        error: function() {
-                            showAlert('Error al eliminar curso', 'danger');
+
+            function displayCursoDetail(curso) {
+                $('#cursoTitle').text((curso.cod_curso || '') + ' - ' + (curso.nombre_curso || ''));
+                $('#detalleCodCurso').text(curso.cod_curso || '');
+                $('#detalleNombreCurso').text(curso.nombre_curso || '');
+                $('#detalleInstructor').text(curso.instructor || '');
+                $('#detalleAno').text(curso.ano || '');
+                $('#detallePeriodo').text(curso.periodo || '');
+                $('#detalleDuracion').text(curso.duracion || '');
+            }
+
+            window.backToMainView = function() {
+                $('#detailView').hide();
+                $('#mainView').show();
+                currentCursoId = null;
+                currentCursoData = null;
+            };
+
+            function loadCursoParticipants() {
+                if (!currentCursoId) return;
+
+                $.ajax({
+                    url: `<?php echo BASE_URL; ?>/cursos/participantes/${currentCursoId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            displayCursoParticipants(response.data || []);
+                        } else {
+                            showAlert(response.message || 'No se pudieron cargar los participantes.', 'danger');
                         }
-                    });
+                    },
+                    error: function() {
+                        showAlert('Error al cargar participantes del curso.', 'danger');
+                    }
+                });
+            }
+
+            function displayCursoParticipants(participants) {
+                const container = $('#courseParticipantsList');
+                container.empty();
+
+                if (!participants || participants.length === 0) {
+                    container.append('<div class="text-muted">No hay participantes inscritos en este curso.</div>');
+                    return;
                 }
+
+                participants.forEach(function (p) {
+                    const item = $(`
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div><strong>${p.cedula_participante}</strong> - ${p.apellido} ${p.nombre}</div>
+                                <div class="small text-muted">
+                                    ${p.telefono || ''}${p.correo ? ' | ' + p.correo : ''}
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-id="${p.id_participante}">
+                                <i class="fas fa-user-minus"></i>
+                            </button>
+                        </div>
+                    `);
+
+                    item.find('button').on('click', function () {
+                        const participanteId = $(this).data('id');
+                        removeParticipanteFromCurso(participanteId);
+                    });
+
+                    container.append(item);
+                });
+            }
+
+            window.searchCursoParticipants = function() {
+                const cedulaRaw = $('#searchCedulaParticipante').val().trim();
+                const nombre = $('#searchNombreParticipante').val().trim();
+                const cedula = normalizeCedula(cedulaRaw);
+
+                if (!cedula && !nombre) {
+                    showAlert('Ingrese cédula o nombre para buscar.', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: '<?php echo BASE_URL; ?>/participantes/search',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: {
+                        cedula: cedula,
+                        nombre: nombre
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            displaySearchParticipantesResults(response.data || []);
+                        } else {
+                            showAlert(response.message || 'No se pudieron buscar participantes.', 'danger');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al buscar participantes.', 'danger');
+                    }
+                });
             };
-            
+
+            function displaySearchParticipantesResults(participants) {
+                const container = $('#searchParticipantesResults');
+                container.empty();
+
+                if (!participants || participants.length === 0) {
+                    container.append('<div class="alert alert-warning mb-0">No se encontraron participantes con los criterios indicados.</div>');
+                    return;
+                }
+
+                participants.forEach(function (p) {
+                    const card = $(`
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div><strong>${p.cedula_participante}</strong> - ${p.apellido} ${p.nombre}</div>
+                                    <div class="small text-muted">
+                                        ${p.telefono || ''}${p.correo ? ' | ' + p.correo : ''}
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-success" data-id="${p.id_participante}">
+                                    <i class="fas fa-user-plus me-1"></i>Agregar
+                                </button>
+                            </div>
+                        </div>
+                    `);
+
+                    card.find('button').on('click', function () {
+                        const participanteId = $(this).data('id');
+                        addParticipanteToCurso(participanteId);
+                    });
+
+                    container.append(card);
+                });
+            }
+
+            window.clearParticipanteSearch = function() {
+                $('#searchCedulaParticipante').val('');
+                $('#searchNombreParticipante').val('');
+                $('#searchParticipantesResults').empty();
+            };
+
+            window.addParticipanteToCurso = function(participanteId) {
+                if (!currentCursoId) {
+                    showAlert('Debe seleccionar un curso primero.', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    url: '<?php echo BASE_URL; ?>/cursos/add-participante',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        curso_id: currentCursoId,
+                        participante_id: participanteId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('Participante agregado correctamente al curso.', 'success');
+                            loadCursoParticipants();
+                        } else {
+                            showAlert(response.message || 'No se pudo agregar el participante.', 'danger');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al agregar participante al curso.', 'danger');
+                    }
+                });
+            };
+
+            function removeParticipanteFromCurso(participanteId) {
+                if (!currentCursoId) {
+                    showAlert('Debe seleccionar un curso primero.', 'warning');
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¿Quitar participante del curso?',
+                    text: 'Esta acción desactivará al participante en este curso.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, quitar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '<?php echo BASE_URL; ?>/cursos/remove-participante',
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                curso_id: currentCursoId,
+                                participante_id: participanteId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    showAlert('Participante quitado del curso.', 'success');
+                                    loadCursoParticipants();
+                                } else {
+                                    showAlert(response.message || 'No se pudo quitar el participante.', 'danger');
+                                }
+                            },
+                            error: function() {
+                                showAlert('Error al quitar participante del curso.', 'danger');
+                            }
+                        });
+                    }
+                });
+            }
+
+            window.printCourseParticipants = function() {
+                if (!currentCursoId) {
+                    showAlert('Debe seleccionar un curso primero.', 'warning');
+                    return;
+                }
+                window.print();
+            };
+
+            window.editCurso = function(id) {
+                window.location.href = `<?php echo BASE_URL; ?>/cursos/edit/${id}`;
+            };
+
+            window.deleteCurso = function(id) {
+                Swal.fire({
+                    title: '¿Eliminar curso?',
+                    text: '¿Está seguro de que desea eliminar este curso? Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `<?php echo BASE_URL; ?>/cursos/delete/${id}`,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    showAlert('Curso eliminado exitosamente', 'success');
+                                    cursosTable.ajax.reload();
+                                } else {
+                                    showAlert(response.message, 'danger');
+                                }
+                            },
+                            error: function() {
+                                showAlert('Error al eliminar curso', 'danger');
+                            }
+                        });
+                    }
+                });
+            };
+
             initTable();
-            
-            // Cargar opciones cuando se abra el modal
-            $('#createCursoModal').on('show.bs.modal', function() {
-                loadOptions();
-            });
         });
     </script>
 </body>

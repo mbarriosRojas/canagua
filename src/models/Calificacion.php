@@ -38,6 +38,11 @@ class Calificacion {
                 $sql .= " AND i.id_instituciones = ?";
                 $params[] = $filters['institucion_id'];
             }
+
+            if (!empty($filters['cedula_estudiante'])) {
+                $sql .= " AND e.cedula_estudiante LIKE ?";
+                $params[] = '%' . $filters['cedula_estudiante'] . '%';
+            }
             
             if (!empty($filters['estudiante_id'])) {
                 $sql .= " AND e.id_estudiante = ?";
@@ -47,6 +52,27 @@ class Calificacion {
             if (!empty($filters['cod_taller'])) {
                 $sql .= " AND c.cod_taller = ?";
                 $params[] = $filters['cod_taller'];
+            }
+
+            if (!empty($filters['ano']) || !empty($filters['ano_escolar'])) {
+                $ano = $filters['ano'] ?? $filters['ano_escolar'];
+                $sql .= " AND t.ano_escolar = ?";
+                $params[] = $ano;
+            }
+
+            if (!empty($filters['lapso'])) {
+                $sql .= " AND t.lapso = ?";
+                $params[] = $filters['lapso'];
+            }
+
+            if (!empty($filters['grado'])) {
+                $sql .= " AND t.grado = ?";
+                $params[] = $filters['grado'];
+            }
+
+            if (!empty($filters['seccion'])) {
+                $sql .= " AND t.seccion = ?";
+                $params[] = $filters['seccion'];
             }
             
             $sql .= " ORDER BY e.apellido, e.nombre, c.cod_taller";
@@ -218,16 +244,38 @@ class Calificacion {
             );
             
             $talleres = $this->db->fetchAll(
-                "SELECT DISTINCT cod_taller FROM talleres ORDER BY cod_taller"
+                "SELECT DISTINCT cod_taller FROM talleres WHERE activo = 1 ORDER BY cod_taller"
+            );
+
+            $instituciones = $this->db->fetchAll(
+                "SELECT id_instituciones, descripcion FROM instituciones WHERE activo = 1 ORDER BY descripcion ASC"
+            );
+
+            $anos = $this->db->fetchAll(
+                "SELECT DISTINCT ano_escolar FROM talleres WHERE activo = 1 AND ano_escolar IS NOT NULL AND ano_escolar != '' ORDER BY ano_escolar DESC"
+            );
+            $lapsos = $this->db->fetchAll(
+                "SELECT DISTINCT lapso FROM talleres WHERE activo = 1 AND lapso IS NOT NULL AND lapso != '' ORDER BY lapso"
+            );
+            $grados = $this->db->fetchAll(
+                "SELECT DISTINCT grado FROM talleres WHERE activo = 1 AND grado IS NOT NULL AND grado != '' ORDER BY grado"
+            );
+            $secciones = $this->db->fetchAll(
+                "SELECT DISTINCT seccion FROM talleres WHERE activo = 1 AND seccion IS NOT NULL AND seccion != '' ORDER BY seccion"
             );
             
             return [
                 'estudiantes' => $estudiantes,
-                'talleres' => $talleres
+                'talleres' => $talleres,
+                'instituciones' => $instituciones,
+                'anos' => $anos,
+                'lapsos' => $lapsos,
+                'grados' => $grados,
+                'secciones' => $secciones
             ];
         } catch (Exception $e) {
             error_log("Error obteniendo opciones de calificaciones: " . $e->getMessage());
-            return ['estudiantes' => [], 'talleres' => []];
+            return ['estudiantes' => [], 'talleres' => [], 'instituciones' => [], 'anos' => [], 'lapsos' => [], 'grados' => [], 'secciones' => []];
         }
     }
     

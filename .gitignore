@@ -1,0 +1,14 @@
+# Configuración con credenciales (usar config.env.example como plantilla)
+config.env
+
+# Dependencias
+vendor/
+composer.phar
+composer-setup.php
+
+# Backups locales
+backups/
+
+# Archivos temporales
+mal.txt
+*.log

@@ -101,95 +101,7 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-graduation-cap fa-2x text-white mb-2"></i>
-                        <h5 class="text-white"><?php echo Config::getAppName(); ?></h5>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/public/dashboard">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/usuarios">
-                                <i class="fas fa-users"></i>
-                                Usuarios
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/programas">
-                                <i class="fas fa-list-alt"></i>
-                                Programas
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/instituciones">
-                                <i class="fas fa-building"></i>
-                                Instituciones
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/estudiantes">
-                                <i class="fas fa-user-graduate"></i>
-                                Estudiantes
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/personal">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                Personal
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/talleres">
-                                <i class="fas fa-tools"></i>
-                                Talleres
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/cursos">
-                                <i class="fas fa-book"></i>
-                                Cursos
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/inventario">
-                                <i class="fas fa-boxes"></i>
-                                Inventario
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/calificaciones">
-                                <i class="fas fa-chart-line"></i>
-                                Calificaciones
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item mt-4">
-                            <a class="nav-link" href="/public/logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <?php $currentModule = null; $currentSection = 'dashboard'; include __DIR__ . '/partials/sidebar.php'; ?>
             
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
@@ -207,7 +119,7 @@
                                     <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
                                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/public/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                                    <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -344,15 +256,15 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <a href="/public/estudiantes" class="btn btn-outline-primary">
+                                    <a href="<?php echo BASE_URL; ?>/estudiantes" class="btn btn-outline-primary">
                                         <i class="fas fa-user-plus me-2"></i>
                                         Registrar Estudiante
                                     </a>
-                                    <a href="/public/talleres" class="btn btn-outline-success">
+                                    <a href="<?php echo BASE_URL; ?>/talleres" class="btn btn-outline-success">
                                         <i class="fas fa-tools me-2"></i>
                                         Crear Taller
                                     </a>
-                                    <a href="/public/cursos" class="btn btn-outline-info">
+                                    <a href="<?php echo BASE_URL; ?>/cursos" class="btn btn-outline-info">
                                         <i class="fas fa-book me-2"></i>
                                         Nuevo Curso
                                     </a>
@@ -365,6 +277,7 @@
         </div>
     </div>
     
+    <?php include __DIR__ . '/partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Dashboard con datos cargados desde PHP

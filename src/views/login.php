@@ -8,11 +8,22 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: url('<?php echo BASE_URL; ?>/assets/images/fondo.jpeg') center center / cover no-repeat fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 0;
+        }
+        body > .login-container {
+            position: relative;
+            z-index: 1;
         }
         
         .login-container {
@@ -30,10 +41,11 @@
             margin-bottom: 2rem;
         }
         
-        .logo i {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
+        .logo .logo-img {
+            display: block;
+            max-width: 160px;
+            height: auto;
+            margin: 0 auto 0.5rem;
         }
         
         .form-control {
@@ -85,19 +97,12 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <i class="fas fa-graduation-cap"></i>
-            <h3 class="text-center mb-0"><?php echo Config::getAppName(); ?></h3>
-            <p class="text-muted text-center">Sistema de Gestión Administrativa</p>
+            <img src="<?php echo BASE_URL; ?>/assets/images/logo.jpeg" alt="<?php echo htmlspecialchars(Config::getAppName()); ?>" class="logo-img">
+            <h3 class="text-center mb-0 mt-2"><?php echo Config::getAppName(); ?></h3>
+            <p class="text-muted text-center small mb-0">Sistema de Gestión Administrativa</p>
         </div>
         
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <form method="POST" action="/public/login">
+        <form method="POST" action="<?php echo BASE_URL; ?>/login">
             <div class="mb-3">
                 <div class="input-group">
                     <span class="input-group-text">
@@ -132,7 +137,12 @@
             </button>
         </form>
         
-        <div class="text-center mt-4">
+        <div class="text-center mt-3">
+            <a href="<?php echo BASE_URL; ?>/recuperar-clave" class="text-decoration-none small">
+                ¿Olvidó su contraseña? Recuperar clave perdida
+            </a>
+        </div>
+        <div class="text-center mt-2">
             <small class="text-muted">
                 <i class="fas fa-shield-alt me-1"></i>
                 Acceso seguro y encriptado
@@ -140,6 +150,11 @@
         </div>
     </div>
     
+    <?php include __DIR__ . '/partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php if (isset($error)): ?>
+    <script>document.addEventListener('DOMContentLoaded', function() { Swal.fire({ icon: 'error', title: 'Error', text: <?php echo json_encode($error); ?> }); });</script>
+    <?php endif; ?>
 </body>
 </html>

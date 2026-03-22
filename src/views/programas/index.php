@@ -48,38 +48,15 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-graduation-cap fa-2x text-white mb-2"></i>
-                        <h5 class="text-white"><?php echo Config::getAppName(); ?></h5>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link" href="/public/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/programas"><i class="fas fa-list-alt"></i> Programas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/instituciones"><i class="fas fa-building"></i> Instituciones</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/personal"><i class="fas fa-chalkboard-teacher"></i> Personal</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/talleres"><i class="fas fa-tools"></i> Talleres</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/cursos"><i class="fas fa-book"></i> Cursos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/inventario"><i class="fas fa-boxes"></i> Inventario</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/calificaciones"><i class="fas fa-chart-line"></i> Calificaciones</a></li>
-                        <li class="nav-item mt-4"><a class="nav-link" href="/public/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-                    </ul>
-                </div>
-            </nav>
-
+            <?php $currentModule = 'programas'; $currentSection = 'index'; include __DIR__ . '/../partials/sidebar.php'; ?>
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><i class="fas fa-list-alt me-2"></i>Gestión de Programas</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProgramaModal">
+                        <a href="<?php echo BASE_URL; ?>/programas/create" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Nuevo Programa
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -109,56 +86,35 @@
         </div>
     </div>
 
-    <!-- Modal Crear Programa -->
-    <div class="modal fade" id="createProgramaModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Nuevo Programa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="createProgramaForm">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cod_programas" class="form-label">Código del Programa *</label>
-                                <input type="text" class="form-control" id="cod_programas" name="cod_programas" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sub_area" class="form-label">Sub Área</label>
-                                <input type="text" class="form-control" id="sub_area" name="sub_area">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="descripcion" class="form-label">Descripción *</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <?php include __DIR__ . '/../partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
     <script>
         $(document).ready(function() {
             let programasTable;
-            
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === '1') {
+                showAlert('Programa guardado correctamente.', 'success');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/programas');
+            }
+            if (urlParams.get('error') === 'notfound') {
+                showAlert('Programa no encontrado.', 'danger');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/programas');
+            }
+            function showAlert(message, type) {
+                const icon = type === 'success' ? 'success' : type === 'danger' ? 'error' : type === 'warning' ? 'warning' : 'info';
+                const title = type === 'success' ? 'Éxito' : type === 'danger' ? 'Error' : type === 'warning' ? 'Aviso' : 'Información';
+                Swal.fire({ icon: icon, title: title, text: message });
+            }
             function initTable() {
                 programasTable = $('#programasTable').DataTable({
                     processing: true,
                     serverSide: false,
                     ajax: {
-                        url: '/public/programas/list',
+                        url: '<?php echo BASE_URL; ?>/programas/list',
                         type: 'GET'
                     },
                     columns: [
@@ -195,64 +151,46 @@
                         }
                     ],
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                    pageLength: 10,
+                    paging: false,
+                    info: false,
                     responsive: true
                 });
             }
             
-            function showAlert(message, type) {
-                const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                $('#alertContainer').html(alertHtml);
-                setTimeout(() => { $('#alertContainer .alert').alert('close'); }, 5000);
-            }
-            
-            $('#createProgramaForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '/public/programas/create',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            $('#createProgramaModal').modal('hide');
-                            $('#createProgramaForm')[0].reset();
-                            showAlert('Programa creado exitosamente', 'success');
-                            programasTable.ajax.reload();
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function() {
-                        showAlert('Error al crear programa', 'danger');
-                    }
-                });
-            });
-            
             window.editPrograma = function(id) {
-                showAlert('Funcionalidad de edición en desarrollo', 'info');
+                window.location.href = `<?php echo BASE_URL; ?>/programas/edit/${id}`;
             };
             
             window.deletePrograma = function(id) {
-                if (confirm('¿Está seguro de que desea eliminar este programa?')) {
-                    $.ajax({
-                        url: `/public/programas/delete/${id}`,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                showAlert('Programa eliminado exitosamente', 'success');
-                                programasTable.ajax.reload();
-                            } else {
-                                showAlert(response.message, 'danger');
+                Swal.fire({
+                    title: '¿Eliminar programa?',
+                    text: '¿Está seguro de que desea eliminar este programa? Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `<?php echo BASE_URL; ?>/programas/delete/${id}`,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    showAlert('Programa eliminado exitosamente', 'success');
+                                    programasTable.ajax.reload();
+                                } else {
+                                    showAlert(response.message, 'danger');
+                                }
+                            },
+                            error: function() {
+                                showAlert('Error al eliminar programa', 'danger');
                             }
-                        },
-                        error: function() {
-                            showAlert('Error al eliminar programa', 'danger');
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             };
             
             initTable();

@@ -57,7 +57,7 @@ class Taller {
     }
     
     /**
-     * Obtener taller por ID
+     * Obtener taller por ID (solo activos)
      */
     public function getById($id) {
         try {
@@ -69,6 +69,21 @@ class Taller {
                  LEFT JOIN instituciones i ON t.instituciones_id_instituciones = i.id_instituciones
                  LEFT JOIN personal per ON t.personal_id_personal = per.id_personal
                  WHERE t.id_taller = ? AND t.activo = 1",
+                [$id]
+            );
+        } catch (Exception $e) {
+            error_log("Error obteniendo taller: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Obtener taller por ID para edición (cualquier estado)
+     */
+    public function getByIdForEdit($id) {
+        try {
+            return $this->db->fetchOne(
+                "SELECT t.* FROM talleres t WHERE t.id_taller = ?",
                 [$id]
             );
         } catch (Exception $e) {
@@ -363,6 +378,51 @@ class Taller {
             
         } catch (Exception $e) {
             error_log("Error obteniendo talleres con conteo: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta, cedula_instructor, programa_id, institucion_id)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT t.*, p.descripcion as programa, i.descripcion as institucion, CONCAT(per.nombre, ' ', per.apellido) as instructor
+                    FROM talleres t
+                    LEFT JOIN programas p ON t.programas_id_programas = p.id_programas
+                    LEFT JOIN instituciones i ON t.instituciones_id_instituciones = i.id_instituciones
+                    LEFT JOIN personal per ON t.personal_id_personal = per.id_personal
+                    WHERE t.activo = 1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (t.cod_taller LIKE ? OR t.grado LIKE ? OR t.seccion LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(t.fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(t.fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            if (!empty($filters['cedula_instructor'])) {
+                $sql .= " AND per.cedula_personal LIKE ?";
+                $params[] = '%' . $filters['cedula_instructor'] . '%';
+            }
+            if (!empty($filters['programa_id'])) {
+                $sql .= " AND t.programas_id_programas = ?";
+                $params[] = $filters['programa_id'];
+            }
+            if (!empty($filters['institucion_id'])) {
+                $sql .= " AND t.instituciones_id_instituciones = ?";
+                $params[] = $filters['institucion_id'];
+            }
+            $sql .= " ORDER BY t.ano_escolar DESC, t.grado, t.seccion";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport talleres: " . $e->getMessage());
             return [];
         }
     }

@@ -32,37 +32,16 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-graduation-cap fa-2x text-white mb-2"></i>
-                        <h5 class="text-white"><?php echo Config::getAppName(); ?></h5>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link" href="/public/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/programas"><i class="fas fa-list-alt"></i> Programas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/instituciones"><i class="fas fa-building"></i> Instituciones</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/personal"><i class="fas fa-chalkboard-teacher"></i> Personal</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="/public/talleres"><i class="fas fa-tools"></i> Talleres</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/cursos"><i class="fas fa-book"></i> Cursos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/inventario"><i class="fas fa-boxes"></i> Inventario</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/public/calificaciones"><i class="fas fa-chart-line"></i> Calificaciones</a></li>
-                        <li class="nav-item mt-4"><a class="nav-link" href="/public/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-                    </ul>
-                </div>
-            </nav>
-
+            <?php $currentModule = 'talleres'; $currentSection = 'index'; include __DIR__ . '/../partials/sidebar.php'; ?>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <!-- Vista Principal de Talleres -->
                 <div id="mainView">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                         <h1 class="h2"><i class="fas fa-tools me-2"></i>Gestión de Talleres</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTallerModal">
+                            <a href="<?php echo BASE_URL; ?>/talleres/create" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Nuevo Taller
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -130,77 +109,6 @@
         </div>
     </div>
 
-    <!-- Modal Crear Taller -->
-    <div class="modal fade" id="createTallerModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Nuevo Taller</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="createTallerForm">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cod_taller" class="form-label">Código del Taller *</label>
-                                <input type="text" class="form-control" id="cod_taller" name="cod_taller" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="ano_escolar" class="form-label">Año Escolar *</label>
-                                <input type="number" class="form-control" id="ano_escolar" name="ano_escolar" min="2020" max="2030" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="programas_id_programas" class="form-label">Programa *</label>
-                                <select class="form-select" id="programas_id_programas" name="programas_id_programas" required>
-                                    <option value="">Seleccionar programa</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="instituciones_id_instituciones" class="form-label">Institución *</label>
-                                <select class="form-select" id="instituciones_id_instituciones" name="instituciones_id_instituciones" required>
-                                    <option value="">Seleccionar institución</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="personal_id_personal" class="form-label">Instructor *</label>
-                                <select class="form-select" id="personal_id_personal" name="personal_id_personal" required>
-                                    <option value="">Seleccionar instructor</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="lapso" class="form-label">Lapso *</label>
-                                <select class="form-select" id="lapso" name="lapso" required>
-                                    <option value="">Seleccionar lapso</option>
-                                    <option value="I">I</option>
-                                    <option value="II">II</option>
-                                    <option value="III">III</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="grado" class="form-label">Grado</label>
-                                <input type="text" class="form-control" id="grado" name="grado">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="seccion" class="form-label">Sección</label>
-                                <input type="text" class="form-control" id="seccion" name="seccion">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Agregar Estudiante -->
     <div class="modal fade" id="addStudentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -215,10 +123,6 @@
                             <div class="col-md-6 mb-3">
                                 <label for="searchCedula" class="form-label">Cédula del Estudiante</label>
                                 <input type="text" class="form-control" id="searchCedula" placeholder="V-12345678">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="searchNombre" class="form-label">Nombre del Estudiante</label>
-                                <input type="text" class="form-control" id="searchNombre" placeholder="Nombre o apellido">
                             </div>
                         </div>
                         <div class="row">
@@ -368,8 +272,10 @@
         </div>
     </div>
 
+    <?php include __DIR__ . '/../partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
     <script>
@@ -378,12 +284,26 @@
             let currentTallerId = null;
             let currentStudentId = null;
             let currentTallerInstitucionId = null;
-            
+            let currentTallerCode = null;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === '1') {
+                showAlert('Taller guardado correctamente.', 'success');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/talleres');
+            }
+            if (urlParams.get('error') === 'notfound') {
+                showAlert('Taller no encontrado.', 'danger');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/talleres');
+            }
+            function showAlert(message, type) {
+                const icon = type === 'success' ? 'success' : type === 'danger' ? 'error' : type === 'warning' ? 'warning' : 'info';
+                const title = type === 'success' ? 'Éxito' : type === 'danger' ? 'Error' : type === 'warning' ? 'Aviso' : 'Información';
+                Swal.fire({ icon: icon, title: title, text: message });
+            }
             function initTable() {
                 talleresTable = $('#talleresTable').DataTable({
                     processing: true,
                     serverSide: false,
-                    ajax: { url: '/public/talleres/list', type: 'GET' },
+                    ajax: { url: '<?php echo BASE_URL; ?>/talleres/list', type: 'GET' },
                     columns: [
                         { data: 'cod_taller' },
                         { data: 'programa' },
@@ -424,14 +344,15 @@
                         }
                     ],
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                    pageLength: 10,
+                    paging: false,
+                    info: false,
                     responsive: true
                 });
             }
             
             function loadOptions() {
                 $.ajax({
-                    url: '/public/talleres/options',
+                    url: '<?php echo BASE_URL; ?>/talleres/options',
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -471,54 +392,28 @@
                 });
             }
             
-            function showAlert(message, type) {
-                const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                $('#alertContainer').html(alertHtml);
-                setTimeout(() => { $('#alertContainer .alert').alert('close'); }, 5000);
-            }
-            
-            // Crear taller
-            $('#createTallerForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '/public/talleres/create',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            $('#createTallerModal').modal('hide');
-                            $('#createTallerForm')[0].reset();
-                            showAlert('Taller creado exitosamente', 'success');
-                            talleresTable.ajax.reload();
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function() {
-                        showAlert('Error al crear taller', 'danger');
-                    }
-                });
-            });
-            
-            // Buscar estudiantes
+            // Buscar estudiantes solo por cédula (se limpia V- y caracteres no numéricos)
             window.searchStudents = function() {
-                const cedula = $('#searchCedula').val();
-                const nombre = $('#searchNombre').val();
+                let cedula = $('#searchCedula').val().trim();
                 
-                if (!cedula && !nombre) {
-                    showAlert('Debe ingresar al menos cédula o nombre para buscar', 'warning');
+                if (!cedula) {
+                    showAlert('Debe ingresar la cédula del estudiante para buscar', 'warning');
+                    return;
+                }
+
+                // Eliminar prefijos tipo V- o E- y cualquier carácter no numérico
+                cedula = cedula.replace(/^[VEve][-]/, '').replace(/[^0-9]/g, '');
+
+                if (!cedula) {
+                    showAlert('La cédula indicada no es válida', 'warning');
                     return;
                 }
                 
                 $.ajax({
-                    url: '/public/estudiantes/search',
+                    url: '<?php echo BASE_URL; ?>/estudiantes/search',
                     method: 'GET',
                     data: { 
-                        cedula: cedula,
-                        nombre: nombre,
-                        institucion: getCurrentTallerInstitucion()
+                        cedula: cedula
                     },
                     dataType: 'json',
                     success: function(response) {
@@ -565,13 +460,12 @@
             
             window.clearSearch = function() {
                 $('#searchCedula').val('');
-                $('#searchNombre').val('');
                 $('#searchResults').html('');
             };
             
             window.addStudentToTaller = function(estudianteId) {
                 $.ajax({
-                    url: '/public/talleres/add-student',
+                    url: '<?php echo BASE_URL; ?>/talleres/add-student',
                     method: 'POST',
                     data: {
                         taller_id: currentTallerId,
@@ -602,14 +496,15 @@
             
             function loadTallerDetail(tallerId) {
                 $.ajax({
-                    url: `/public/talleres/get/${tallerId}`,
+                    url: `<?php echo BASE_URL; ?>/talleres/get/${tallerId}`,
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
                             const taller = response.data;
-                            // guardar id de institución para búsquedas
+                            // guardar datos del taller para búsquedas y enlaces
                             currentTallerInstitucionId = taller.instituciones_id_instituciones || taller.institucion_id || null;
+                            currentTallerCode = taller.cod_taller || null;
                             displayTallerInfo(taller);
                             loadTallerStudents();
                         } else {
@@ -642,7 +537,7 @@
             
             function loadTallerStudents() {
                 $.ajax({
-                    url: `/public/talleres/students/${currentTallerId}`,
+                    url: `<?php echo BASE_URL; ?>/talleres/students/${currentTallerId}`,
                     method: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -682,8 +577,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-2 text-end">
-                                        <button class="btn btn-primary btn-sm" onclick="openGradesModal(${student.estudiante_id_estudiante || student.id_estudiante}, '${student.nombre} ${student.apellido}', '${student.cedula_estudiante}')">
-                                            <i class="fas fa-chart-line me-1"></i>Calificaciones
+                                        <button class="btn btn-primary btn-sm" onclick="goToCalificacionCreate(${student.estudiante_id_estudiante || student.id_estudiante})">
+                                            <i class="fas fa-chart-line me-1"></i>Calificar
                                         </button>
                                     </div>
                                 </div>
@@ -695,6 +590,16 @@
                 $('#studentsList').html(html);
             }
             
+            // Ir a la pantalla de creación de calificación con estudiante y taller preseleccionados
+            window.goToCalificacionCreate = function(estudianteId) {
+                if (!currentTallerCode) {
+                    showAlert('No se pudo determinar el código del taller.', 'warning');
+                    return;
+                }
+                const baseUrl = '<?php echo BASE_URL; ?>';
+                const url = `${baseUrl}/calificaciones/create?estudiante_id=${encodeURIComponent(estudianteId)}&cod_taller=${encodeURIComponent(currentTallerCode)}`;
+                window.location.href = url;
+            };
             window.openGradesModal = function(estudianteId, nombre, cedula) {
                 console.log('[grades] openGradesModal', { estudianteId, currentTallerId });
                 currentStudentId = estudianteId;
@@ -714,7 +619,7 @@
             
             function loadStudentGrades(estudianteId) {
                 $.ajax({
-                    url: `/public/calificaciones/by-student-taller`,
+                    url: `<?php echo BASE_URL; ?>/calificaciones/by-student-taller`,
                     method: 'GET',
                     data: {
                         estudiante_id: estudianteId,
@@ -795,7 +700,7 @@
                 $submitBtn.prop('disabled', true).append(' <span class="spinner-border spinner-border-sm"></span>');
                 
                 $.ajax({
-                    url: '/public/calificaciones/save-grades',
+                    url: '<?php echo BASE_URL; ?>/calificaciones/save-grades',
                     method: 'POST',
                     data: payload,
                     dataType: 'json',
@@ -853,28 +758,39 @@
             };
             
             window.editTaller = function(id) {
-                showAlert('Funcionalidad de edición en desarrollo', 'info');
+                window.location.href = `<?php echo BASE_URL; ?>/talleres/edit/${id}`;
             };
             
             window.deleteTaller = function(id) {
-                if (confirm('¿Está seguro de que desea eliminar este taller?')) {
-                    $.ajax({
-                        url: `/public/talleres/delete/${id}`,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                showAlert('Taller eliminado exitosamente', 'success');
-                                talleresTable.ajax.reload();
-                            } else {
-                                showAlert(response.message, 'danger');
+                Swal.fire({
+                    title: '¿Eliminar taller?',
+                    text: '¿Está seguro de que desea eliminar este taller? Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `<?php echo BASE_URL; ?>/talleres/delete/${id}`,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    showAlert('Taller eliminado exitosamente', 'success');
+                                    talleresTable.ajax.reload();
+                                } else {
+                                    showAlert(response.message, 'danger');
+                                }
+                            },
+                            error: function() {
+                                showAlert('Error al eliminar taller', 'danger');
                             }
-                        },
-                        error: function() {
-                            showAlert('Error al eliminar taller', 'danger');
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             };
             
             function getCurrentTallerInstitucion() {
@@ -910,9 +826,6 @@
             initTable();
             
             // Cargar opciones cuando se abra el modal
-            $('#createTallerModal').on('show.bs.modal', function() {
-                loadOptions();
-            });
         });
     </script>
 </body>

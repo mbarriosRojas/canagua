@@ -203,6 +203,98 @@ class Auth {
     }
     
     /**
+     * Obtener usuario por username para recuperación de clave (sin login).
+     * Devuelve null si no existe o está inactivo.
+     */
+    public function getUsuarioByUsernameForRecovery($username) {
+        try {
+            $user = $this->db->fetchOne(
+                "SELECT id_usuario, username, email, nombre, apellido FROM usuarios WHERE username = ? AND activo = 1",
+                [trim($username)]
+            );
+            return $user ?: null;
+        } catch (Exception $e) {
+            error_log("Error obteniendo usuario para recuperación: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Actualizar contraseña por ID (solo para recuperación de clave, sin verificar sesión).
+     */
+    public function setPasswordByUserIdForRecovery($userId, $newPassword) {
+        try {
+            $result = $this->db->update(
+                "UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?",
+                [password_hash($newPassword, PASSWORD_DEFAULT), (int) $userId]
+            );
+            return $result > 0;
+        } catch (Exception $e) {
+            error_log("Error actualizando contraseña (recovery): " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtener usuario por ID (sin password_hash)
+     */
+    public function getUserById($id) {
+        try {
+            if (!$this->isSupervisor()) {
+                return null;
+            }
+            $user = $this->db->fetchOne(
+                "SELECT id_usuario, username, email, nombre, apellido, rol, activo, fecha_creacion, ultimo_acceso 
+                 FROM usuarios WHERE id_usuario = ?",
+                [(int) $id]
+            );
+            return $user ?: null;
+        } catch (Exception $e) {
+            error_log("Error obteniendo usuario: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Actualizar usuario (username, email, nombre, apellido, rol, activo). No modifica contraseña.
+     */
+    public function updateUser($id, $data) {
+        try {
+            if (!$this->isSupervisor()) {
+                return ['success' => false, 'message' => 'No tiene permisos para editar usuarios'];
+            }
+            $existing = $this->getUserById($id);
+            if (!$existing) {
+                return ['success' => false, 'message' => 'Usuario no encontrado'];
+            }
+            // Verificar username/email únicos excluyendo el actual
+            $dup = $this->db->fetchOne(
+                "SELECT id_usuario FROM usuarios WHERE (username = ? OR email = ?) AND id_usuario != ?",
+                [$data['username'], $data['email'], (int) $id]
+            );
+            if ($dup) {
+                return ['success' => false, 'message' => 'El usuario o email ya está en uso'];
+            }
+            $this->db->update(
+                "UPDATE usuarios SET username = ?, email = ?, nombre = ?, apellido = ?, rol = ?, activo = ? WHERE id_usuario = ?",
+                [
+                    $data['username'],
+                    $data['email'],
+                    $data['nombre'],
+                    $data['apellido'],
+                    $data['rol'],
+                    isset($data['activo']) ? (int) $data['activo'] : $existing['activo'],
+                    (int) $id
+                ]
+            );
+            return ['success' => true];
+        } catch (Exception $e) {
+            error_log("Error actualizando usuario: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Error interno del servidor'];
+        }
+    }
+    
+    /**
      * Obtener lista de usuarios
      */
     public function getUsers() {
@@ -247,6 +339,37 @@ class Auth {
             
         } catch (Exception $e) {
             error_log("Error cambiando estado de usuario: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Error interno del servidor'];
+        }
+    }
+    
+    /**
+     * Eliminar usuario (solo admin, no puede eliminarse a sí mismo)
+     */
+    public function deleteUser($userId) {
+        try {
+            if (!$this->isAdmin()) {
+                return ['success' => false, 'message' => 'No tiene permisos para eliminar usuarios'];
+            }
+            
+            $currentUser = $this->getCurrentUser();
+            if ($currentUser && (int) $currentUser['id'] === (int) $userId) {
+                return ['success' => false, 'message' => 'No puede eliminar su propio usuario'];
+            }
+            
+            $result = $this->db->delete(
+                "DELETE FROM usuarios WHERE id_usuario = ?",
+                [(int) $userId]
+            );
+            
+            if ($result > 0) {
+                return ['success' => true];
+            } else {
+                return ['success' => false, 'message' => 'Usuario no encontrado'];
+            }
+            
+        } catch (Exception $e) {
+            error_log("Error eliminando usuario: " . $e->getMessage());
             return ['success' => false, 'message' => 'Error interno del servidor'];
         }
     }

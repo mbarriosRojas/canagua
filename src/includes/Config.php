@@ -26,12 +26,12 @@ class Config {
         self::$config = [
             'app' => [
                 'name' => $_ENV['APP_NAME'] ?? 'Sistema SACRGAPI',
-                'url' => $_ENV['APP_URL'] ?? 'http://localhost:8080',
+                'url' => $_ENV['APP_URL'] ?? 'http://localhost/SACRGAPI/public',
                 'env' => $_ENV['APP_ENV'] ?? 'development',
                 'timezone' => 'America/Caracas'
             ],
             'database' => [
-                'host' => $_ENV['DB_HOST'] ?? 'db',
+                'host' => $_ENV['DB_HOST'] ?? 'localhost',
                 'name' => $_ENV['DB_NAME'] ?? 'sacrgapi_database',
                 'user' => $_ENV['DB_USER'] ?? 'sacrgapi_user',
                 'pass' => $_ENV['DB_PASS'] ?? 'sacrgapi_password_2024'
@@ -43,6 +43,15 @@ class Config {
             'security' => [
                 'encryption_key' => $_ENV['ENCRYPTION_KEY'] ?? 'default_key_change_in_production',
                 'jwt_secret' => $_ENV['JWT_SECRET'] ?? 'default_jwt_secret_change_in_production'
+            ],
+            'mail' => [
+                'from' => $_ENV['MAIL_FROM'] ?? 'noreply@' . (parse_url($_ENV['APP_URL'] ?? 'http://localhost', PHP_URL_HOST) ?: 'localhost'),
+                'from_name' => $_ENV['MAIL_FROM_NAME'] ?? $_ENV['APP_NAME'] ?? 'SACRGAPI',
+                'smtp_host' => $_ENV['MAIL_SMTP_HOST'] ?? '',
+                'smtp_port' => (int) ($_ENV['MAIL_SMTP_PORT'] ?? 587),
+                'smtp_user' => $_ENV['MAIL_SMTP_USER'] ?? '',
+                'smtp_pass' => $_ENV['MAIL_SMTP_PASS'] ?? '',
+                'smtp_secure' => $_ENV['MAIL_SMTP_SECURE'] ?? 'tls'
             ]
         ];
         

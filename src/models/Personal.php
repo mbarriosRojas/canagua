@@ -172,4 +172,32 @@ class Personal {
             return ['total' => 0, 'por_cargo' => []];
         }
     }
+    
+    /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT * FROM personal WHERE 1=1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (cedula_personal LIKE ? OR nombre LIKE ? OR apellido LIKE ? OR cargo LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term; $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            $sql .= " ORDER BY apellido, nombre";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport personal: " . $e->getMessage());
+            return [];
+        }
+    }
 }

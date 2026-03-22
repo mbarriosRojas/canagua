@@ -87,7 +87,7 @@ class Estudiante {
     }
     
     /**
-     * Obtener estudiante por ID
+     * Obtener estudiante por ID (solo activos)
      */
     public function getById($id) {
         try {
@@ -96,6 +96,24 @@ class Estudiante {
                  FROM estudiante e 
                  LEFT JOIN instituciones i ON e.instituciones_id_instituciones = i.id_instituciones 
                  WHERE e.id_estudiante = ? AND e.activo = 1",
+                [$id]
+            );
+        } catch (Exception $e) {
+            error_log("Error obteniendo estudiante: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Obtener estudiante por ID para edición (cualquier estado)
+     */
+    public function getByIdForEdit($id) {
+        try {
+            return $this->db->fetchOne(
+                "SELECT e.*, i.descripcion as institucion_nombre, i.cod_institucion 
+                 FROM estudiante e 
+                 LEFT JOIN instituciones i ON e.instituciones_id_instituciones = i.id_instituciones 
+                 WHERE e.id_estudiante = ?",
                 [$id]
             );
         } catch (Exception $e) {
@@ -317,6 +335,41 @@ class Estudiante {
             
         } catch (Exception $e) {
             error_log("Error buscando estudiantes: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta, institucion_id)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT e.*, i.descripcion as institucion_nombre, i.cod_institucion 
+                    FROM estudiante e 
+                    LEFT JOIN instituciones i ON e.instituciones_id_instituciones = i.id_instituciones 
+                    WHERE e.activo = 1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (e.nombre LIKE ? OR e.apellido LIKE ? OR e.cedula_estudiante LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(e.fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(e.fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            if (!empty($filters['institucion_id'])) {
+                $sql .= " AND e.instituciones_id_instituciones = ?";
+                $params[] = $filters['institucion_id'];
+            }
+            $sql .= " ORDER BY e.apellido, e.nombre";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport estudiantes: " . $e->getMessage());
             return [];
         }
     }

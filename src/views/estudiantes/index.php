@@ -96,96 +96,7 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-graduation-cap fa-2x text-white mb-2"></i>
-                        <h5 class="text-white"><?php echo Config::getAppName(); ?></h5>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/dashboard">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/usuarios">
-                                <i class="fas fa-users"></i>
-                                Usuarios
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/programas">
-                                <i class="fas fa-list-alt"></i>
-                                Programas
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/instituciones">
-                                <i class="fas fa-building"></i>
-                                Instituciones
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/public/estudiantes">
-                                <i class="fas fa-user-graduate"></i>
-                                Estudiantes
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/personal">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                Personal
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/talleres">
-                                <i class="fas fa-tools"></i>
-                                Talleres
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/cursos">
-                                <i class="fas fa-book"></i>
-                                Cursos
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/inventario">
-                                <i class="fas fa-boxes"></i>
-                                Inventario
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="/public/calificaciones">
-                                <i class="fas fa-chart-line"></i>
-                                Calificaciones
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item mt-4">
-                            <a class="nav-link" href="/public/logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
+            <?php $currentModule = 'estudiantes'; $currentSection = 'index'; include __DIR__ . '/../partials/sidebar.php'; ?>
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -194,54 +105,14 @@
                         Gestión de Estudiantes
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEstudianteModal">
+                        <a href="<?php echo BASE_URL; ?>/estudiantes/create" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>
                             Nuevo Estudiante
-                        </button>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Alertas -->
                 <div id="alertContainer"></div>
-
-                <!-- Filtros -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">
-                            <i class="fas fa-filter me-2"></i>Filtros de Búsqueda
-                        </h6>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="cedulaFilter" class="form-label">Cédula de Identidad</label>
-                                <input type="text" class="form-control" id="cedulaFilter" placeholder="V-12345678">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="nombreFilter" class="form-label">Nombre o Apellido</label>
-                                <input type="text" class="form-control" id="nombreFilter" placeholder="María Pérez">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="institucionFilter" class="form-label">Institución</label>
-                                <select class="form-select" id="institucionFilter">
-                                    <option value="">Todas las instituciones</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <button type="button" class="btn btn-primary me-2" id="filterBtn">
-                                    <i class="fas fa-search me-2"></i>Buscar Estudiantes
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
-                                    <i class="fas fa-times me-2"></i>Limpiar Filtros
-                                </button>
-                                <small class="text-muted ms-3">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Los resultados aparecerán aquí después de aplicar los filtros
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Tabla de estudiantes -->
                 <div class="card">
@@ -264,9 +135,9 @@
                                 <tbody>
                                     <tr>
                                         <td colspan="9" class="text-center text-muted py-4">
-                                            <i class="fas fa-search fa-2x mb-3 d-block"></i>
-                                            <h5>No hay estudiantes mostrados</h5>
-                                            <p>Utiliza los filtros de búsqueda para encontrar estudiantes específicos</p>
+                                            <i class="fas fa-user-graduate fa-2x mb-3 d-block"></i>
+                                            <h5>No hay estudiantes registrados</h5>
+                                            <p>Utilice "Nuevo Estudiante" para agregar estudiantes</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -275,85 +146,6 @@
                     </div>
                 </div>
             </main>
-        </div>
-    </div>
-
-    <!-- Modal Crear Estudiante -->
-    <div class="modal fade" id="createEstudianteModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-user-plus me-2"></i>
-                        Nuevo Estudiante
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="createEstudianteForm">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cedula_estudiante" class="form-label">Cédula del Estudiante *</label>
-                                <input type="text" class="form-control" id="cedula_estudiante" name="cedula_estudiante" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sexo" class="form-label">Sexo *</label>
-                                <select class="form-select" id="sexo" name="sexo" required>
-                                    <option value="">Seleccionar</option>
-                                    <option value="M">Masculino</option>
-                                    <option value="F">Femenino</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="apellido" class="form-label">Primer Apellido *</label>
-                                <input type="text" class="form-control" id="apellido" name="apellido" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="nombre" class="form-label">Primer Nombre *</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="apellido_2" class="form-label">Segundo Apellido</label>
-                                <input type="text" class="form-control" id="apellido_2" name="apellido_2">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="lugar_nacimiento" class="form-label">Lugar de Nacimiento</label>
-                                <input type="text" class="form-control" id="lugar_nacimiento" name="lugar_nacimiento">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" id="telefono" name="telefono">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cedula_representante" class="form-label">Cédula del Representante</label>
-                                <input type="text" class="form-control" id="cedula_representante" name="cedula_representante">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="instituciones_id_instituciones" class="form-label">Institución *</label>
-                                <select class="form-select" id="instituciones_id_instituciones" name="instituciones_id_instituciones" required>
-                                    <option value="">Seleccionar institución</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>
-                            Guardar Estudiante
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 
@@ -437,34 +229,43 @@
         </div>
     </div>
 
+    <?php include __DIR__ . '/../partials/uppercase-forms.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     
     <script>
         $(document).ready(function() {
             let estudiantesTable;
-            
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === '1') {
+                showAlert('Estudiante guardado correctamente.', 'success');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/estudiantes');
+            }
+            if (urlParams.get('error') === 'notfound') {
+                showAlert('Estudiante no encontrado.', 'danger');
+                if (window.history.replaceState) window.history.replaceState({}, '', '<?php echo BASE_URL; ?>/estudiantes');
+            }
+            function showAlert(message, type) {
+                const icon = type === 'success' ? 'success' : type === 'danger' ? 'error' : type === 'warning' ? 'warning' : 'info';
+                const title = type === 'success' ? 'Éxito' : type === 'danger' ? 'Error' : type === 'warning' ? 'Aviso' : 'Información';
+                Swal.fire({ icon: icon, title: title, text: message });
+            }
             // Inicializar DataTable
             function initTable() {
                 estudiantesTable = $('#estudiantesTable').DataTable({
                     processing: true,
-                    serverSide: true,
+                    serverSide: false,
                     ajax: {
-                        url: '/public/estudiantes/list',
+                        url: '<?php echo BASE_URL; ?>/estudiantes/list',
                         type: 'GET',
                         data: function(d) {
-                            return {
-                                page: Math.floor(d.start / d.length) + 1,
-                                limit: d.length,
-                                cedula: $('#cedulaFilter').val(),
-                                nombre: $('#nombreFilter').val(),
-                                institucion: $('#institucionFilter').val()
-                            };
+                            return { page: 1, limit: 99999 };
                         },
                         dataSrc: function(json) {
-                            return json.data;
+                            return (json && json.data) ? json.data : [];
                         }
                     },
                     columns: [
@@ -515,100 +316,26 @@
                     ],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-                        emptyTable: "No hay estudiantes mostrados. Utiliza los filtros de búsqueda para encontrar estudiantes específicos.",
-                        zeroRecords: "No se encontraron estudiantes con los filtros aplicados."
+                        emptyTable: "No hay estudiantes registrados.",
+                        zeroRecords: "No se encontraron coincidencias."
                     },
-                    pageLength: 10,
+                    paging: false,
                     responsive: true,
-                    paging: true,
                     searching: false,
-                    info: true,
-                    lengthChange: true,
-                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                    info: false,
+                    lengthChange: false,
                     order: [[1, 'asc']],
-                    drawCallback: function(settings) {
-                        // Ocultar mensaje de "no hay datos" si hay resultados
-                        if (settings.json && settings.json.data && settings.json.data.length > 0) {
-                            $('#estudiantesTable tbody tr').removeClass('d-none');
-                        }
-                    }
                 });
             }
             
-            // Cargar estudiantes con filtros
+            // Recargar lista de estudiantes
             function loadEstudiantes() {
                 estudiantesTable.ajax.reload();
             }
             
-            // Mostrar alerta
-            function showAlert(message, type) {
-                const alertHtml = `
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
-                $('#alertContainer').html(alertHtml);
-                setTimeout(() => {
-                    $('#alertContainer .alert').alert('close');
-                }, 5000);
-            }
-            
-            // Crear estudiante
-            $('#createEstudianteForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '/public/estudiantes/create',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            $('#createEstudianteModal').modal('hide');
-                            $('#createEstudianteForm')[0].reset();
-                            showAlert('Estudiante creado exitosamente', 'success');
-                            loadEstudiantes();
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function() {
-                        showAlert('Error al crear estudiante', 'danger');
-                    }
-                });
-            });
-            
-            // Editar estudiante
+            // Editar estudiante (redirige a página de edición)
             window.editEstudiante = function(id) {
-                $.ajax({
-                    url: `/public/estudiantes/get/${id}`,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            const estudiante = response.data;
-                            
-                            // Llenar el formulario
-                            $('#edit_id').val(estudiante.id_estudiante);
-                            $('#edit_cedula_estudiante').val(estudiante.cedula_estudiante);
-                            $('#edit_apellido').val(estudiante.apellido);
-                            $('#edit_nombre').val(estudiante.nombre);
-                            $('#edit_apellido_2').val(estudiante.apellido_2 || '');
-                            $('#edit_sexo').val(estudiante.sexo);
-                            $('#edit_lugar_nacimiento').val(estudiante.lugar_nacimiento || '');
-                            $('#edit_cedula_representante').val(estudiante.cedula_representante || '');
-                            $('#edit_telefono').val(estudiante.telefono || '');
-                            $('#edit_instituciones_id_instituciones').val(estudiante.instituciones_id_instituciones || '');
-                            
-                            $('#editEstudianteModal').modal('show');
-                        } else {
-                            showAlert('No se pudieron cargar los datos del estudiante', 'danger');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        showAlert('Error al cargar datos del estudiante', 'danger');
-                    }
-                });
+                window.location.href = `<?php echo BASE_URL; ?>/estudiantes/edit/${id}`;
             };
             
             // Actualizar estudiante
@@ -618,7 +345,7 @@
                 const id = $('#edit_id').val();
                 
                 $.ajax({
-                    url: `/public/estudiantes/update/${id}`,
+                    url: `<?php echo BASE_URL; ?>/estudiantes/update/${id}`,
                     method: 'POST',
                     data: $(this).serialize(),
                     dataType: 'json',
@@ -639,55 +366,41 @@
             
             // Eliminar estudiante
             window.deleteEstudiante = function(id) {
-                if (confirm('¿Está seguro de que desea eliminar este estudiante?')) {
-                    $.ajax({
-                        url: `/public/estudiantes/delete/${id}`,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                showAlert('Estudiante eliminado exitosamente', 'success');
-                                loadEstudiantes();
-                            } else {
-                                showAlert(response.message, 'danger');
+                Swal.fire({
+                    title: '¿Eliminar estudiante?',
+                    text: '¿Está seguro de que desea eliminar este estudiante? Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `<?php echo BASE_URL; ?>/estudiantes/delete/${id}`,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    showAlert('Estudiante eliminado exitosamente', 'success');
+                                    loadEstudiantes();
+                                } else {
+                                    showAlert(response.message, 'danger');
+                                }
+                            },
+                            error: function() {
+                                showAlert('Error al eliminar estudiante', 'danger');
                             }
-                        },
-                        error: function() {
-                            showAlert('Error al eliminar estudiante', 'danger');
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             };
-            
-            // Filtros
-            $('#filterBtn').on('click', function() {
-                loadEstudiantes();
-            });
-            
-            $('#clearFiltersBtn').on('click', function() {
-                $('#cedulaFilter').val('');
-                $('#nombreFilter').val('');
-                $('#institucionFilter').val('');
-                loadEstudiantes();
-            });
-            
-            // Permitir búsqueda con Enter en los campos de texto
-            $('#cedulaFilter, #nombreFilter').on('keypress', function(e) {
-                if (e.which === 13) {
-                    loadEstudiantes();
-                }
-            });
-            
-            // Búsqueda automática al cambiar el select de institución
-            $('#institucionFilter').on('change', function() {
-                loadEstudiantes();
-            });
             
             // Cargar instituciones
             function loadInstituciones() {
                 console.log('Iniciando carga de instituciones...');
                 
-                // Datos de prueba temporales para verificar que el select funciona
                 const institucionesPrueba = [
                     {id_instituciones: 1, descripcion: 'Instituto Tecnológico Nacional'},
                     {id_instituciones: 2, descripcion: 'Universidad Central de Venezuela'},
@@ -696,63 +409,34 @@
                     {id_instituciones: 5, descripcion: 'Centro de Estudios Avanzados'}
                 ];
                 
-                // Cargar datos de prueba primero
-                console.log('Cargando datos de prueba...');
                 const selectCreate = $('#instituciones_id_instituciones');
                 const selectEdit = $('#edit_instituciones_id_instituciones');
-                const selectFilter = $('#institucionFilter');
                 
-                console.log('Selectores encontrados:', {
-                    create: selectCreate.length,
-                    edit: selectEdit.length,
-                    filter: selectFilter.length
-                });
-                
-                // Limpiar opciones existentes (excepto la primera)
                 selectCreate.find('option:not(:first)').remove();
                 selectEdit.find('option:not(:first)').remove();
-                selectFilter.find('option:not(:first)').remove();
                 
-                // Agregar datos de prueba
                 institucionesPrueba.forEach(function(institucion) {
                     const option = `<option value="${institucion.id_instituciones}">${institucion.descripcion}</option>`;
                     selectCreate.append(option);
                     selectEdit.append(option);
-                    selectFilter.append(option);
                 });
                 
-                console.log('Datos de prueba agregados:', institucionesPrueba.length);
-                
-                // Ahora intentar cargar datos reales
                 $.ajax({
-                    url: window.location.origin + '/public/instituciones/options',
+                    url: window.location.origin + '<?php echo BASE_URL; ?>/instituciones/options',
                     type: 'GET',
                     success: function(response) {
-                        console.log('Respuesta recibida:', response);
                         if (response.success && response.data && response.data.length > 0) {
-                            console.log('Datos reales de instituciones:', response.data);
-                            
-                            // Limpiar opciones existentes (excepto la primera)
                             selectCreate.find('option:not(:first)').remove();
                             selectEdit.find('option:not(:first)').remove();
-                            selectFilter.find('option:not(:first)').remove();
-                            
-                            // Agregar opciones reales
                             response.data.forEach(function(institucion) {
                                 const option = `<option value="${institucion.id_instituciones}">${institucion.descripcion}</option>`;
                                 selectCreate.append(option);
                                 selectEdit.append(option);
-                                selectFilter.append(option);
                             });
-                            
-                            console.log('Instituciones reales agregadas:', response.data.length);
-                        } else {
-                            console.log('No se pudieron cargar datos reales, usando datos de prueba');
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error al cargar instituciones reales:', error);
-                        console.log('Usando datos de prueba');
+                        console.error('Error al cargar instituciones:', error);
                     }
                 });
             }

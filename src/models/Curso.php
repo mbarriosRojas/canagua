@@ -16,7 +16,16 @@ class Curso {
      */
     public function getAll($filters = []) {
         try {
-            $sql = "SELECT c.*, CONCAT(p.nombre, ' ', p.apellido) as instructor, p.cargo
+            $sql = "SELECT 
+                        c.*,
+                        CONCAT(p.nombre, ' ', p.apellido) as instructor,
+                        p.cargo,
+                        (
+                            SELECT COUNT(*) 
+                            FROM participantes pa 
+                            WHERE pa.cursos_id_cursos = c.id_cursos 
+                              AND pa.activo = 1
+                        ) AS participantes_count
                     FROM cursos c
                     LEFT JOIN personal p ON c.personal_id_personal = p.id_personal
                     WHERE c.activo = 1";
@@ -54,7 +63,7 @@ class Curso {
     }
     
     /**
-     * Obtener curso por ID
+     * Obtener curso por ID (solo activos)
      */
     public function getById($id) {
         try {
@@ -63,6 +72,21 @@ class Curso {
                  FROM cursos c
                  LEFT JOIN personal p ON c.personal_id_personal = p.id_personal
                  WHERE c.id_cursos = ? AND c.activo = 1",
+                [$id]
+            );
+        } catch (Exception $e) {
+            error_log("Error obteniendo curso: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Obtener curso por ID para edición (cualquier estado)
+     */
+    public function getByIdForEdit($id) {
+        try {
+            return $this->db->fetchOne(
+                "SELECT * FROM cursos WHERE id_cursos = ?",
                 [$id]
             );
         } catch (Exception $e) {
@@ -116,7 +140,7 @@ class Curso {
     public function update($id, $data) {
         try {
             // Verificar que el curso existe
-            $existing = $this->getById($id);
+            $existing = $this->getByIdForEdit($id);
             if (!$existing) {
                 return ['success' => false, 'message' => 'Curso no encontrado'];
             }
@@ -214,6 +238,50 @@ class Curso {
         } catch (Exception $e) {
             error_log("Error obteniendo estadísticas: " . $e->getMessage());
             return ['total' => 0, 'por_periodo' => [], 'por_año' => []];
+        }
+    }
+    
+    /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta, cedula_participante)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT 
+                        c.*,
+                        CONCAT(per.nombre, ' ', per.apellido) as instructor,
+                        pa.cedula_participante,
+                        pa.apellido AS participante_apellido,
+                        pa.nombre AS participante_nombre
+                    FROM cursos c
+                    LEFT JOIN personal per ON c.personal_id_personal = per.id_personal
+                    LEFT JOIN participantes pa 
+                        ON pa.cursos_id_cursos = c.id_cursos
+                        AND pa.activo = 1
+                    WHERE c.activo = 1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (c.cod_curso LIKE ? OR c.nombre_curso LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['cedula_participante'])) {
+                // Buscar por la parte numérica de la cédula (ej: 12345678 coincide con V-12345678 / E-12345678)
+                $sql .= " AND pa.cedula_participante LIKE ?";
+                $params[] = '%' . $filters['cedula_participante'] . '%';
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(c.fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(c.fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            $sql .= " ORDER BY c.ano DESC, c.nombre_curso";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport cursos: " . $e->getMessage());
+            return [];
         }
     }
 }

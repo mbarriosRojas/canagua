@@ -170,6 +170,34 @@ class Programa {
     }
     
     /**
+     * Datos para reportes (filtros: search, fecha_desde, fecha_hasta)
+     */
+    public function getForReport($filters = []) {
+        try {
+            $sql = "SELECT * FROM programas WHERE 1=1";
+            $params = [];
+            if (!empty($filters['search'])) {
+                $sql .= " AND (descripcion LIKE ? OR cod_programas LIKE ? OR sub_area LIKE ?)";
+                $term = '%' . $filters['search'] . '%';
+                $params[] = $term; $params[] = $term; $params[] = $term;
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $sql .= " AND DATE(fecha_creacion) >= ?";
+                $params[] = $filters['fecha_desde'];
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $sql .= " AND DATE(fecha_creacion) <= ?";
+                $params[] = $filters['fecha_hasta'];
+            }
+            $sql .= " ORDER BY descripcion ASC";
+            return $this->db->fetchAll($sql, $params);
+        } catch (Exception $e) {
+            error_log("Error getForReport programas: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
      * Obtener opciones para formularios
      */
     public function getFormOptions() {

@@ -32,6 +32,21 @@ CREATE TABLE usuarios (
 );
 
 -- =============================================
+-- TABLA LOG (trazas de ingreso al sistema)
+-- =============================================
+CREATE TABLE IF NOT EXISTS `log` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    IP VARCHAR(45),
+    `Time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Details TEXT,
+    `Page` VARCHAR(255),
+    clave VARCHAR(255),
+    usuario VARCHAR(100),
+    INDEX idx_time (`Time`),
+    INDEX idx_usuario (usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
 -- TABLA PROGRAMAS
 -- =============================================
 CREATE TABLE programas (
@@ -168,6 +183,7 @@ CREATE TABLE inventario (
     id_inventario INT AUTO_INCREMENT PRIMARY KEY,
     personal_id_personal INT NOT NULL,
     cod_equipo VARCHAR(20) UNIQUE NOT NULL,
+    nombre VARCHAR(200),
     ubicacion VARCHAR(100),
     cedula_personal VARCHAR(20),
     cantidad INT DEFAULT 1,
@@ -182,6 +198,17 @@ CREATE TABLE inventario (
     observacion TEXT,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (personal_id_personal) REFERENCES personal(id_personal)
+);
+
+-- =============================================
+-- TABLA REPARACIONES
+-- =============================================
+CREATE TABLE reparaciones (
+    id_reparacion INT AUTO_INCREMENT PRIMARY KEY,
+    inventario_id_inventario INT NOT NULL,
+    fecha DATE NOT NULL,
+    motivo TEXT,
+    FOREIGN KEY (inventario_id_inventario) REFERENCES inventario(id_inventario)
 );
 
 -- =============================================
@@ -216,6 +243,34 @@ CREATE TABLE notas (
     recibio_certificado BOOLEAN DEFAULT FALSE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (participantes_id_participantes) REFERENCES participantes(id_participantes)
+);
+
+-- =============================================
+-- TABLA CONFIGURACION GENERAL
+-- =============================================
+CREATE TABLE IF NOT EXISTS configuracion (
+    id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    rif VARCHAR(20) NOT NULL,
+    direccion TEXT NULL,
+    telefono VARCHAR(30) NULL,
+    email VARCHAR(150) NULL,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- =============================================
+-- TABLA DIRECTIVOS
+-- =============================================
+CREATE TABLE IF NOT EXISTS directivos (
+    id_directivo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    cargo VARCHAR(100) NOT NULL,
+    telefono VARCHAR(30) NULL,
+    email VARCHAR(150) NULL,
+    firma TINYINT(1) NOT NULL DEFAULT 0,
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =============================================
@@ -301,12 +356,12 @@ INSERT INTO calificaciones (estudiante_id_estudiante, cedula_estudiante, cod_tal
 (6, 'V-12121212', 'TALL003', 'B', 16.5, 16.0, 17.0, 16.5, 16.5);
 
 -- Insertar inventario de ejemplo
-INSERT INTO inventario (personal_id_personal, cod_equipo, ubicacion, cedula_personal, cantidad, estado, serial, marca, modelo, color, medidas, capacidad, otras_caracteristicas, observacion) VALUES
-(1, 'EQ001', 'Aula 101', 'V-12345678', 1, 'Bueno', 'SN123456', 'Dell', 'OptiPlex 7090', 'Negro', '35x25x8 cm', '8GB RAM', 'Intel i5, 256GB SSD', 'Equipo en perfecto estado'),
-(1, 'EQ002', 'Aula 101', 'V-12345678', 1, 'Bueno', 'SN789012', 'HP', 'ProBook 450', 'Plata', '35x25x3 cm', '16GB RAM', 'Intel i7, 512GB SSD', 'Laptop para instructor'),
-(2, 'EQ003', 'Aula 102', 'V-87654321', 1, 'Regular', 'SN345678', 'Lenovo', 'ThinkPad E15', 'Negro', '36x25x2 cm', '8GB RAM', 'AMD Ryzen 5, 256GB SSD', 'Requiere mantenimiento menor'),
-(3, 'EQ004', 'Oficina Principal', 'V-11223344', 1, 'Bueno', 'SN901234', 'Canon', 'PIXMA G3110', 'Blanco', '45x35x15 cm', 'Impresión A4', 'Impresora multifuncional', 'Nueva, sin usar'),
-(4, 'EQ005', 'Aula 103', 'V-55667788', 1, 'Bueno', 'SN567890', 'Epson', 'PowerLite 1781W', 'Blanco', '30x25x10 cm', '3000 lúmenes', 'Proyector portátil', 'Excelente calidad de imagen');
+INSERT INTO inventario (personal_id_personal, cod_equipo, nombre, ubicacion, cedula_personal, cantidad, estado, serial, marca, modelo, color, medidas, capacidad, otras_caracteristicas, observacion) VALUES
+(1, 'EQ001', NULL, 'Aula 101', 'V-12345678', 1, 'Bueno', 'SN123456', 'Dell', 'OptiPlex 7090', 'Negro', '35x25x8 cm', '8GB RAM', 'Intel i5, 256GB SSD', 'Equipo en perfecto estado'),
+(1, 'EQ002', NULL, 'Aula 101', 'V-12345678', 1, 'Bueno', 'SN789012', 'HP', 'ProBook 450', 'Plata', '35x25x3 cm', '16GB RAM', 'Intel i7, 512GB SSD', 'Laptop para instructor'),
+(2, 'EQ003', NULL, 'Aula 102', 'V-87654321', 1, 'Regular', 'SN345678', 'Lenovo', 'ThinkPad E15', 'Negro', '36x25x2 cm', '8GB RAM', 'AMD Ryzen 5, 256GB SSD', 'Requiere mantenimiento menor'),
+(3, 'EQ004', NULL, 'Oficina Principal', 'V-11223344', 1, 'Bueno', 'SN901234', 'Canon', 'PIXMA G3110', 'Blanco', '45x35x15 cm', 'Impresión A4', 'Impresora multifuncional', 'Nueva, sin usar'),
+(4, 'EQ005', NULL, 'Aula 103', 'V-55667788', 1, 'Bueno', 'SN567890', 'Epson', 'PowerLite 1781W', 'Blanco', '30x25x10 cm', '3000 lúmenes', 'Proyector portátil', 'Excelente calidad de imagen');
 
 -- Insertar participantes de ejemplo
 INSERT INTO participantes (cursos_id_cursos, cedula_participante, apellido, nombre, sexo, telefono, correo, direccion) VALUES

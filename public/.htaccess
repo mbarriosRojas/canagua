@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Redirigir todo el trafico hacia index.php (enrutador frontal)
+# Este archivo debe estar en la carpeta public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# Configuraciones de seguridad
+<Files "*.php">
+    # Permitir solo index.php directamente
+</Files>

@@ -1,0 +1,12 @@
+{
+    "name": "sacrgapi/app",
+    "description": "SACRGAPI",
+    "require": {
+        "php": ">=7.4",
+        "dompdf/dompdf": "^2.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "classmap": []
+    }
+}
